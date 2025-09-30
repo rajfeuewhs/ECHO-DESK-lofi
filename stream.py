@@ -12,7 +12,7 @@ video_file = "video_30p.mp4"
 audio_file = "audio.mp3"
 
 # YouTube Stream Key
-stream_key = "kmqx-xeh8-11ds-t258-a5sd"
+stream_key = "gs7k-jhh0-frfu-d21m-fszx"
 stream_url = f"rtmp://a.rtmp.youtube.com/live2/{stream_key}"
 
 def download_file(drive_id, output_file):
