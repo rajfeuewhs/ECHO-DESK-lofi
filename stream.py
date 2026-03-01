@@ -5,7 +5,7 @@ import gdown
 
 # ====== CONFIG ======
 VIDEO_ID = "14inbmVMM29WFGa5Q39OSltwrNABhNnmL"   # Google Drive video ID
-STREAM_KEY = "45yg-mdpr-drjd-vjpw-6pf2"     # YouTube Stream Key
+STREAM_KEY = "u6dh-ewt8-8df6-mf8r-1v5r"     # YouTube Stream Key
 
 VIDEO_FILE = "video.mp4"
 STREAM_URL = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}"
