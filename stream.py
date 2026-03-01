@@ -1,49 +1,50 @@
-import gdown
 import subprocess
 import time
 import os
+import gdown
 
-# Google Drive IDs
-video_drive_id = "1rGAcB4auk5ntD2KuOQNCGN-okczz3smv"  # 30s video
-audio_drive_id = "1X_hkJOC9CPK3cdG88u0AaIgEaOES5HjZ"   # 1h30 audio
+# ====== CONFIG ======
+VIDEO_ID = "14inbmVMM29WFGa5Q39OSltwrNABhNnmL"   # Google Drive video ID
+STREAM_KEY = "u6dh-ewt8-8df6-mf8r-1v5r"     # YouTube Stream Key
 
-# Local file names
-video_file = "video_30p.mp4"
-audio_file = "audio.mp3"
+VIDEO_FILE = "video.mp4"
+STREAM_URL = f"rtmp://a.rtmp.youtube.com/live2/{STREAM_KEY}"
 
-# YouTube Stream Key
-stream_key = "gs7k-jhh0-frfu-d21m-fszx"
-stream_url = f"rtmp://a.rtmp.youtube.com/live2/{stream_key}"
 
-def download_file(drive_id, output_file):
-    if os.path.exists(output_file):
-        print(f"{output_file} exists, skipping download.")
+def download_video():
+    """Download video from Google Drive if not exists"""
+    if os.path.exists(VIDEO_FILE):
+        print("Video already exists, skipping download.")
         return
-    print(f"Downloading {output_file}...")
-    gdown.download(id=drive_id, output=output_file, quiet=False)
+    
+    url = f"https://drive.google.com/uc?id={VIDEO_ID}"
+    print("Downloading video from Drive...")
+    gdown.download(url, VIDEO_FILE, quiet=False)
+
 
 def stream_video_loop():
-    """Loop video + audio both infinitely"""
+    """Loop video infinitely with very low CPU usage"""
+    
+    command = [
+        "ffmpeg",
+        "-re",
+        "-stream_loop", "-1",
+        "-i", VIDEO_FILE,
+        "-c:v", "copy",     # LOW CPU
+        "-c:a", "copy",     # LOW CPU
+        "-f", "flv",
+        STREAM_URL
+    ]
+
     while True:
         print("Starting stream...")
         try:
-            subprocess.run([
-                "ffmpeg",
-                "-re",                     
-                "-stream_loop", "-1", "-i", video_file,   # loop video forever
-                "-stream_loop", "-1", "-i", audio_file,   # loop audio forever
-                "-map", "0:v:0",
-                "-map", "1:a:0",
-                "-c:v", "copy",            
-                "-c:a", "aac", "-b:a", "128k",
-                "-f", "flv",
-                stream_url
-            ], check=True)
+            subprocess.run(command, check=True)
         except subprocess.CalledProcessError:
-            print("FFmpeg crashed, restarting in 5 sec...")
+            print("FFmpeg crashed! Restarting in 5 seconds...")
             time.sleep(5)
 
+
 if __name__ == "__main__":
-    download_file(video_drive_id, video_file)
-    download_file(audio_drive_id, audio_file)
+    download_video()
     stream_video_loop()
